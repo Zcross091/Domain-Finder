@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Domain Finder — Free .COM Domain Discovery Engine</title>
+  <meta name="description" content="Find available .com domains instantly. Generates brandable names and checks real-time availability against the official Verisign RDAP registry. 100% free, no signup required.">
+  <meta name="keywords" content="domain finder, free domains, domain availability, domain checker, brand name generator, .com domains">
+  <meta property="og:title" content="Domain Finder — Free .COM Domain Discovery Engine">
+  <meta property="og:description" content="Find available .com domains instantly. Real-time availability checks against official Verisign RDAP registry.">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ═══════════════════════════════════════════════════
+       DESIGN SYSTEM — TOKENS
+       ═══════════════════════════════════════════════════ */
+    :root {
+      --bg-base: #06080d;
+      --bg-surface: #0d1017;
+      --bg-elevated: #131720;
+      --border-subtle: #1c2030;
+      --border-default: #252b3d;
+
+      --accent-cyan: #00e5ff;
+      --accent-cyan-dim: rgba(0, 229, 255, 0.12);
+      --accent-green: #00ff87;
+      --accent-green-dim: rgba(0, 255, 135, 0.10);
+      --accent-red: #ff3860;
+      --accent-red-dim: rgba(255, 56, 96, 0.10);
+      --accent-amber: #ffb830;
+      --accent-purple: #a855f7;
+
+      --text-primary: #e8ecf4;
+      --text-secondary: #8892a6;
+      --text-tertiary: #5c6577;
+
+      --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+
+      --shadow-low: 0 2px 8px rgba(0,0,0,0.3);
+      --shadow-mid: 0 8px 30px rgba(0,0,0,0.4);
+      --shadow-high: 0 16px 50px rgba(0,0,0,0.6);
+
+      --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-default: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       RESET & BASE
+       ═══════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-display);
+      background: var(--bg-base);
+      color: var(--text-primary);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+    }
+
+    /* Ambient background glow */
+    body::before {
+      content: "";
+      position: fixed;
+      top: -30%; left: -10%;
+      width: 60%; height: 60%;
+      background: radial-gradient(circle, rgba(0, 229, 255, 0.04) 0%, transparent 65%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::after {
+      content: "";
+      position: fixed;
+      bottom: -20%; right: -10%;
+      width: 50%; height: 50%;
+      background: radial-gradient(circle, rgba(168, 85, 247, 0.03) 0%, transparent 65%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Subtle grid overlay */
+    .grid-overlay {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0, 229, 255, 0.018) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 229, 255, 0.018) 1px, transparent 1px);
+      background-size: 40px 40px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       LAYOUT
+       ═══════════════════════════════════════════════════ */
+    .app-shell {
+      position: relative;
+      z-index: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 24px 60px;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       HEADER
+       ═══════════════════════════════════════════════════ */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: 32px;
+    }
+
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 40% 40%, var(--accent-cyan) 0%, rgba(0,229,255,0.15) 50%, transparent 70%);
+      border: 1.5px solid rgba(0,229,255,0.35);
+      box-shadow: 0 0 20px rgba(0,229,255,0.25), inset 0 0 12px rgba(0,229,255,0.15);
+      position: relative;
+      animation: pulse-icon 3s ease-in-out infinite;
+    }
+
+    .logo-icon::after {
+      content: "";
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 8px; height: 8px;
+      background: #fff;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 0 6px #fff;
+    }
+
+    @keyframes pulse-icon {
+      0%, 100% { box-shadow: 0 0 20px rgba(0,229,255,0.25), inset 0 0 12px rgba(0,229,255,0.15); }
+      50% { box-shadow: 0 0 30px rgba(0,229,255,0.4), inset 0 0 18px rgba(0,229,255,0.25); }
+    }
+
+    .logo-text {
+      font-family: var(--font-mono);
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+
+    .logo-text .highlight { color: var(--accent-cyan); }
+    .logo-text .dim { color: var(--text-tertiary); font-weight: 400; }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .header-gh-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      background: var(--bg-elevated);
+      border: 1px solid var(--border-default);
+      padding: 6px 14px;
+      border-radius: 20px;
+      text-decoration: none;
+      transition: all var(--transition-fast);
+    }
+
+    .header-gh-btn:hover {
+      color: #fff;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px rgba(0, 229, 255, 0.2);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--accent-green);
+      background: var(--accent-green-dim);
+      border: 1px solid rgba(0,255,135,0.2);
+      padding: 6px 14px;
+      border-radius: 20px;
+      letter-spacing: 0.05em;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--accent-green);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent-green);
+      animation: blink 1.4s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    /* ═══════════════════════════════════════════════════
+       CONTROL DECK (Input Panel)
+       ═══════════════════════════════════════════════════ */
+    .control-deck {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow-mid);
+      backdrop-filter: blur(8px);
+    }
+
+    .control-row {
+      display: grid;
+      grid-template-columns: 2.5fr 1fr 1fr auto;
+      gap: 16px;
+      align-items: end;
+    }
+
+    @media (max-width: 860px) {
+      .control-row {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 520px) {
+      .control-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .field-group label {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent-cyan);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .field-group input,
+    .field-group select {
+      width: 100%;
+      background: var(--bg-base);
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      outline: none;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .field-group select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238892a6'%3E%3Cpath d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+
+    .field-group input:focus,
+    .field-group select:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 3px var(--accent-cyan-dim);
+    }
+
+    .field-group input::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-cyan), #0080ff);
+      color: #000;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 13px 28px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      transition: all var(--transition-fast);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+    }
+
+    .btn-primary:hover::before { opacity: 1; }
+
+    .btn-primary:hover {
+      box-shadow: 0 0 24px rgba(0,229,255,0.4);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-primary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+
+    /* Probe bar (single domain check) */
+    .probe-section {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px dashed var(--border-subtle);
+      display: flex;
+      gap: 12px;
+    }
+
+    .probe-section input { flex: 1; }
+
+    .btn-secondary {
+      background: var(--bg-elevated);
+      color: var(--text-primary);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid var(--border-default);
+      border-radius: var(--radius-sm);
+      padding: 0 20px;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+      box-shadow: 0 0 12px var(--accent-cyan-dim);
+    }
+
+    .btn-secondary:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       RESULTS TOOLBAR
+       ═══════════════════════════════════════════════════ */
+    .results-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 20px;
+      padding: 0 4px;
+    }
+
+    .results-toolbar strong { color: var(--accent-green); }
+
+    .filter-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--text-primary);
+      user-select: none;
+    }
+
+    .filter-toggle input {
+      width: auto !important;
+      accent-color: var(--accent-cyan);
+    }
+
+    /* ═══════════════════════════════════════════════════
+       PROGRESS BAR
+       ═══════════════════════════════════════════════════ */
+    .progress-container {
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .progress-container.active { display: block; }
+
+    .progress-track {
+      height: 3px;
+      background: var(--border-subtle);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green));
+      border-radius: 2px;
+      transition: width 200ms ease;
+      box-shadow: 0 0 8px rgba(0,229,255,0.4);
+    }
+
+    .progress-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-secondary);
+    }
+
+    .progress-label strong { color: var(--accent-cyan); }
+
+    /* ═══════════════════════════════════════════════════
+       DOMAIN RESULT CARDS
+       ═══════════════════════════════════════════════════ */
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 14px;
+    }
+
+    @media (max-width: 420px) {
+      .results-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .domain-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 20px;
+      position: relative;
+      transition: all var(--transition-default);
+      animation: card-in 400ms ease both;
+    }
+
+    @keyframes card-in {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .domain-card.is-available {
+      border-color: rgba(0,255,135,0.3);
+      background: linear-gradient(180deg, rgba(0,255,135,0.04) 0%, var(--bg-surface) 100%);
+    }
+
+    .domain-card.is-available:hover {
+      border-color: rgba(0,255,135,0.5);
+      box-shadow: 0 4px 24px rgba(0,255,135,0.08);
+      transform: translateY(-2px);
+    }
+
+    .domain-card.is-taken {
+      opacity: 0.4;
+      border-color: var(--border-subtle);
+    }
+
+    .domain-card.is-taken:hover {
+      opacity: 0.6;
+    }
+
+    .domain-card.is-checking {
+      border-color: rgba(0,229,255,0.2);
+    }
+
+    .card-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .card-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
+
+    .card-style-tag {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-tertiary);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border-subtle);
+      padding: 3px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-left: 10px;
+    }
+
+    .card-domain {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--accent-cyan);
+      margin-bottom: 16px;
+      opacity: 0.85;
+    }
+
+    .card-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+
+    .card-status {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .card-status.available { color: var(--accent-green); }
+    .card-status.taken { color: var(--accent-red); }
+    .card-status.checking { color: var(--accent-amber); }
+    .card-status.unknown { color: var(--text-tertiary); }
+
+    .btn-claim {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      color: #000;
+      background: var(--accent-green);
+      text-decoration: none;
+      padding: 6px 14px;
+      border-radius: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      transition: all var(--transition-fast);
+    }
+
+    .btn-claim:hover {
+      box-shadow: 0 0 16px rgba(0,255,135,0.5);
+      transform: translateY(-1px);
+    }
+
+    /* Single-probe result toast */
+    .probe-result {
+      display: none;
+      margin-top: 16px;
+      padding: 14px 18px;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-mono);
+      font-size: 13px;
+      font-weight: 600;
+      animation: slide-in 300ms ease;
+    }
+
+    @keyframes slide-in {
+      from { opacity: 0; transform: translateX(-8px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    .probe-result.available {
+      display: block;
+      background: var(--accent-green-dim);
+      border: 1px solid rgba(0,255,135,0.3);
+      color: var(--accent-green);
+    }
+
+    .probe-result.taken {
+      display: block;
+      background: var(--accent-red-dim);
+      border: 1px solid rgba(255,56,96,0.3);
+      color: var(--accent-red);
+    }
+
+    .probe-result.unknown {
+      display: block;
+      background: rgba(255,184,48,0.08);
+      border: 1px solid rgba(255,184,48,0.3);
+      color: var(--accent-amber);
+    }
+
+    .probe-result a {
+      color: inherit;
+      margin-left: 12px;
+    }
+
+    /* Empty state */
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--text-tertiary);
+      font-family: var(--font-mono);
+      font-size: 13px;
+    }
+
+    .empty-state .empty-icon {
+      font-size: 40px;
+      margin-bottom: 16px;
+      opacity: 0.4;
+    }
+
+    /* Spinner */
+    .spinner {
+      display: inline-block;
+      width: 13px;
+      height: 13px;
+      border: 2px solid rgba(0,0,0,0.3);
+      border-top-color: #000;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+
+    .spinner.light {
+      border-color: rgba(255,255,255,0.2);
+      border-top-color: var(--accent-cyan);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Footer */
+    .footer {
+      margin-top: 48px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border-subtle);
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--text-tertiary);
+    }
+
+    .footer a {
+      color: var(--accent-cyan);
+      text-decoration: none;
+    }
+
+    .footer a:hover { text-decoration: underline; }
+
+        /* Copy available button */
+    .btn-copy {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--accent-cyan);
+      background: var(--accent-cyan-dim);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      border-radius: var(--radius-sm);
+      padding: 4px 12px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      margin-left: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-copy:hover {
+      background: rgba(0, 229, 255, 0.25);
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 12px var(--accent-cyan-dim);
+    }
+    .btn-copy.copied {
+      color: var(--accent-green);
+      border-color: var(--accent-green);
+      background: var(--accent-green-dim);
+    }
+
+    .domain-card.is-checking {
+      border-color: rgba(0, 229, 255, 0.35);
+      background: linear-gradient(180deg, rgba(0, 229, 255, 0.04) 0%, var(--bg-surface) 100%);
+    }
+
+    /* TLD selector chips */
+    .tld-selector {
+      margin-top: 16px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .tld-selector-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--text-tertiary);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-right: 4px;
+    }
+
+    .tld-chip {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: var(--bg-base);
+      border: 1px solid var(--border-default);
+      border-radius: 20px;
+      padding: 5px 12px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      user-select: none;
+    }
+
+    .tld-chip:hover {
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+
+    .tld-chip.active {
+      background: var(--accent-cyan-dim);
+      border-color: var(--accent-cyan);
+      color: var(--accent-cyan);
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-overlay"></div>
+
+  <div class="app-shell">
+    <!-- ════ HEADER ════ -->
+    <header class="header">
+      <div class="logo-group">
+        <div class="logo-icon" aria-hidden="true"></div>
+        <h1 class="logo-text">
+          DOMAIN<span class="highlight">FINDER</span>
+          <span class="dim"> // .COM</span>
+        </h1>
+      </div>
+      <div class="header-actions">
+        <div class="status-badge">
+          <span class="status-dot"></span>
+          <span>RDAP REGISTRY LIVE</span>
+        </div>
+        <a href="https://github.com/Zcross091/Domain-Finder" target="_blank" rel="noopener" class="header-gh-btn" title="View Source on GitHub">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub
+        </a>
+      </div>
+    </header>
+
+    <!-- ════ CONTROL DECK ════ -->
+    <section class="control-deck" aria-label="Search controls">
+      <div class="control-row">
+        <div class="field-group">
+          <label for="keyword-input">Seed Keyword (Optional)</label>
+          <input type="text" id="keyword-input" placeholder="e.g. apex, flux, pulse, orbit, nova">
+        </div>
+        <div class="field-group">
+          <label for="theme-select">Naming Engine</label>
+          <select id="theme-select">
+            <option value="all">Mix (All Types)</option>
+            <option value="compound">Two-Word Compounds</option>
+            <option value="invented">Synthetic Tech</option>
+            <option value="short">Minimalist (5-7 Chars)</option>
+            <option value="agency">Agency & Growth</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label for="count-select">Scan Depth</label>
+          <select id="count-select">
+            <option value="15">15 Candidates</option>
+            <option value="25" selected>25 Candidates</option>
+            <option value="40">40 Candidates</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label>&nbsp;</label>
+          <button class="btn-primary" id="scan-btn">
+            <span id="scan-btn-text">▶ Execute Scan</span>
+            <div class="spinner" id="scan-spinner" style="display:none;"></div>
+          </button>
+        </div>
+      </div>
+
+      <!-- TLD selection -->
+      <div class="tld-selector">
+        <span class="tld-selector-label">TLDs:</span>
+        <span class="tld-chip active" data-tld=".com">.com</span>
+        <span class="tld-chip" data-tld=".net">.net</span>
+        <span class="tld-chip" data-tld=".org">.org</span>
+        <span class="tld-chip" data-tld=".io">.io</span>
+        <span class="tld-chip" data-tld=".dev">.dev</span>
+        <span class="tld-chip" data-tld=".app">.app</span>
+      </div>
+
+      <!-- Direct probe bar -->
+      <div class="probe-section">
+        <input type="text" id="probe-input" placeholder="Check a specific domain directly (e.g. zenithflow.com)">
+        <button class="btn-secondary" id="probe-btn">Probe</button>
+      </div>
+      <div class="probe-result" id="probe-result"></div>
+    </section>
+
+    <!-- ════ PROGRESS BAR ════ -->
+    <div class="progress-container" id="progress-container">
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width: 0%"></div>
+      </div>
+      <div class="progress-label" id="progress-label">Initializing scan...</div>
+    </div>
+
+    <!-- ════ RESULTS TOOLBAR ════ -->
+    <div class="results-toolbar" id="results-toolbar" style="display:none;">
+      <div id="results-summary"></div>
+      <label class="filter-toggle">
+        <input type="checkbox" id="filter-available" checked>
+        Show Available Only
+      </label>
+      <button id="btn-copy-available" class="btn-copy" style="display:none;" title="Copy all available domains to clipboard">⧉ Copy Available</button>
+    </div>
+
+    <!-- ════ RESULTS GRID ════ -->
+    <div class="results-grid" id="results-grid"></div>
+
+    <!-- ════ FOOTER ════ -->
+    <footer class="footer">
+      Domain Finder — Authoritative Registry RDAP (Verisign, PIR, Identity Digital, Google) &amp; Cloudflare DoH Consensus.
+      100% Client-Side. Runs natively on <a href="https://pages.github.com/" target="_blank" rel="noopener">GitHub Pages</a>.
+      Open Source on <a href="https://github.com/Zcross091/Domain-Finder" target="_blank" rel="noopener">GitHub</a>.
+    </footer>
+  </div>
+
+  <script>
+    /* ═══════════════════════════════════════════════════════════════
+       BRAND NAME GENERATOR ENGINE (Client-Side & Offline-Ready)
+       ═══════════════════════════════════════════════════════════════ */
+    const PREFIXES = [
+      "North","Apex","Peak","Vanguard","Crest","Nova","Aura","Iron","Volt","Echo",
+      "Strat","Omni","Pulse","Flux","Core","Prime","Val","Axon","Aero",
+      "Zen","Sol","Velo","Cobalt","Slate","Atlas","Onyx","Kite","Forge",
+      "Scale","Metric","Hyper","Terra","Strive","Vector","Arc","Bold","Loom",
+      "Beacon","True","Swift","Clear","High","Grand","Front","Deep","Rise","Spark"
+    ];
+
+    const ROOTS = [
+      "lane","path","crest","wave","point","flow","bridge","line","reach","base",
+      "vault","craft","shift","beam","bloom","forge","spark","grid","gate","mark",
+      "node","stack","pulse","link","field","view","track","helm","spire","dock",
+      "loom","bound","scale","cast","stride","drive","scope","wing","yard","port"
+    ];
+
+    const SUFFIXES = [
+      "ix","ora","is","ex","ara","on","us","io","eo","ium","aero","ify","ly","ops"
+    ];
+
+    const TECH_START = [
+      "vel","nov","strat","kyn","nex","zen","lum","ark","pyr","zep",
+      "vol","tal","bre","sol","cal","mar","cyr","aer","fen","drak"
+    ];
+
+    const TECH_END = [
+      "tra","tor","tis","ron","tix","aris","alis","onic","ora","ent",
+      "ion","aro","eus","ark","est","ix","ium","ex","is","ant","yx"
+    ];
+
+    const AGENCY_QUALS = [
+      "media","growth","ads","digital","hq","scale","lab","studio","group"
+    ];
+
+    function capitalize(s) {
+      if (!s) return "";
+      return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+    }
+
+    function pickRandom(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function sanitizeDomain(input) {
+      let s = (input || "").toLowerCase().trim();
+      s = s.replace(/^(?:https?:\/\/)?(?:www\.)?/i, "");
+      s = s.split("/")[0].split("?")[0].split("#")[0];
+      s = s.replace(/[^a-z0-9.-]/g, "");
+      s = s.replace(/^[.-]+|[.-]+$/g, "");
+      if (!s.includes(".")) {
+        s += ".com";
+      }
+      return s;
+    }
+
+    /**
+     * Generate brand name candidates
+     */
+    function generateBrandNames(opts = {}) {
+      const count = opts.count || 25;
+      const keyword = (opts.keyword || "").trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+      const theme = (opts.theme || "all").toLowerCase();
+      const tlds = opts.tlds && opts.tlds.length ? opts.tlds : [".com"];
+
+      const seen = new Set();
+      const results = [];
+
+      function addCandidate(rawName, style) {
+        if (!rawName) return;
+        const cleanName = rawName.charAt(0).toUpperCase() + rawName.slice(1);
+        const baseDomain = cleanName.toLowerCase().replace(/[^a-z0-9]/g, "");
+        if (baseDomain.length < 3 || baseDomain.length > 25) return;
+
+        for (const tld of tlds) {
+          const domain = baseDomain + (tld.startsWith(".") ? tld : "." + tld);
+          if (!seen.has(domain)) {
+            seen.add(domain);
+            results.push({ name: cleanName, domain, style });
+          }
+        }
+      }
+
+      // 1. Keyword-seeded names
+      if (keyword) {
+        const kwCap = capitalize(keyword);
+        for (const r of ROOTS) addCandidate(kwCap + capitalize(r), "Keyword Compound");
+        for (const p of PREFIXES) addCandidate(p + kwCap, "Keyword Compound");
+        for (const s of SUFFIXES) addCandidate(kwCap + s, "Invented Keyword");
+        for (const q of AGENCY_QUALS) addCandidate(kwCap + capitalize(q), "Agency Keyword Variant");
+      }
+
+      // 2. Two-Word Compounds
+      if (theme === "all" || theme === "compound") {
+        for (let i = 0; i < 200; i++) {
+          addCandidate(pickRandom(PREFIXES) + capitalize(pickRandom(ROOTS)), "Two-Word Compound");
+        }
+      }
+
+      // 3. Invented Neologisms
+      if (theme === "all" || theme === "invented") {
+        for (let i = 0; i < 150; i++) {
+          addCandidate(capitalize(pickRandom(TECH_START) + pickRandom(TECH_END)), "Synthetic Tech");
+        }
+      }
+
+      // 4. Short brandmarks
+      if (theme === "all" || theme === "short") {
+        for (let i = 0; i < 150; i++) {
+          addCandidate(capitalize(pickRandom(PREFIXES).toLowerCase() + pickRandom(SUFFIXES)), "Brandmark");
+        }
+      }
+
+      // 5. Agency & Growth Brands
+      if (theme === "all" || theme === "agency") {
+        for (let i = 0; i < 150; i++) {
+          addCandidate(pickRandom(PREFIXES) + capitalize(pickRandom(AGENCY_QUALS)), "Agency & Growth");
+        }
+      }
+
+      // Fisher-Yates unbiased shuffle
+      for (let i = results.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const temp = results[i];
+        results[i] = results[j];
+        results[j] = temp;
+      }
+
+      return results.slice(0, count);
+    }
+
+
+    /* ═══════════════════════════════════════════════════════════════
+       DOMAIN AVAILABILITY CHECKER (Authoritative Registries + DoH)
+       ═══════════════════════════════════════════════════════════════ */
+
+    function getRdapEndpoint(domain) {
+      const lower = domain.toLowerCase();
+      const parts = lower.split(".");
+      const tld = parts.length > 1 ? parts[parts.length - 1] : "com";
+
+      if (tld === "com" || tld === "net") {
+        return {
+          url: "https://rdap.verisign.com/" + tld + "/v1/domain/" + lower,
+          registry: "Verisign RDAP"
+        };
+      }
+      if (tld === "org") {
+        return {
+          url: "https://rdap.publicinterestregistry.org/rdap/domain/" + lower,
+          registry: "PIR RDAP"
+        };
+      }
+      if (tld === "io") {
+        return {
+          url: "https://rdap.identitydigital.services/rdap/domain/" + lower,
+          registry: "Identity Digital RDAP"
+        };
+      }
+      if (tld === "dev" || tld === "app") {
+        return {
+          url: "https://pubapi.registry.google/rdap/domain/" + lower,
+          registry: "Google Registry RDAP"
+        };
+      }
+      return {
+        url: "https://rdap.org/domain/" + lower,
+        registry: "RDAP.org Registry"
+      };
+    }
+
+    async function checkRDAP(domain) {
+      const { url, registry } = getRdapEndpoint(domain);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+      try {
+        const res = await fetch(url, {
+          signal: controller.signal,
+          headers: { "Accept": "application/rdap+json, application/json, text/plain, */*" },
+          redirect: "follow"
+        });
+        clearTimeout(timeoutId);
+
+        if (res.status === 404) return { available: true, method: registry + " (404 Not Found)", registry };
+        if (res.status === 200) return { available: false, method: registry + " (Registered)", registry };
+        return { available: null, method: registry + " (Status " + res.status + ")", registry };
+      } catch (err) {
+        clearTimeout(timeoutId);
+        // Fallback to local server API ONLY if running on localhost dev server
+        if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+          try {
+            const apiRes = await fetch("/api/check?domain=" + encodeURIComponent(domain));
+            if (apiRes.ok) {
+              const apiData = await apiRes.json();
+              if (apiData.details && apiData.details.rdap) {
+                return apiData.details.rdap;
+              }
+            }
+          } catch (_) {}
+        }
+        return { available: null, error: err.name === "AbortError" ? "Timeout" : err.message, registry };
+      }
+    }
+
+    async function checkDNS(domain) {
+      // 1. Cloudflare DNS over HTTPS (CORS wildcard enabled: *)
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
+        const res = await fetch("https://cloudflare-dns.com/dns-query?name=" + encodeURIComponent(domain) + "&type=A", {
+          signal: controller.signal,
+          headers: { "Accept": "application/dns-json" }
+        });
+        clearTimeout(timeoutId);
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.Status === 3) return { hasDns: false, status: "NXDOMAIN" };
+          if (data.Status === 0 && data.Answer && data.Answer.length > 0) return { hasDns: true, status: "ACTIVE_DNS" };
+          if (data.Status === 0) return { hasDns: true, status: "ZONE_EXISTS" };
+        }
+      } catch (_) {}
+
+      // 2. Google DNS over HTTPS
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 4000);
+        const res = await fetch("https://dns.google/resolve?name=" + encodeURIComponent(domain) + "&type=A", {
+          signal: controller.signal,
+          headers: { "Accept": "application/dns-json" }
+        });
+        clearTimeout(timeoutId);
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.Status === 3) return { hasDns: false, status: "NXDOMAIN" };
+          if (data.Status === 0 && data.Answer && data.Answer.length > 0) return { hasDns: true, status: "ACTIVE_DNS" };
+          if (data.Status === 0) return { hasDns: true, status: "ZONE_EXISTS" };
+        }
+      } catch (_) {}
+
+      return { hasDns: null, status: "UNKNOWN" };
+    }
+
+    async function checkDomainAvailability(rawDomain) {
+      const domain = sanitizeDomain(rawDomain);
+      const buyUrl = "https://www.namecheap.com/domains/registration/results/?domain=" + encodeURIComponent(domain);
+
+      const rdap = await checkRDAP(domain);
+
+      if (rdap.available === false) {
+        return {
+          domain,
+          available: false,
+          status: "TAKEN",
+          confidence: "High (" + (rdap.registry || "Official Registry") + ")",
+          buyUrl,
+          details: { rdap }
+        };
+      }
+
+      if (rdap.available === true) {
+        const dns = await checkDNS(domain);
+        const isCleanDns = dns.hasDns === false;
+        return {
+          domain,
+          available: true,
+          status: "AVAILABLE",
+          confidence: isCleanDns ? "Verified (Registry 404 + NXDOMAIN)" : "Verified (Registry 404)",
+          buyUrl,
+          details: { rdap, dns }
+        };
+      }
+
+      // RDAP timed out or was inconclusive — fallback to DNS
+      const dns = await checkDNS(domain);
+      if (dns.hasDns === true) {
+        return {
+          domain,
+          available: false,
+          status: "TAKEN",
+          confidence: "Medium (Active DNS Records)",
+          buyUrl,
+          details: { rdap, dns }
+        };
+      }
+      if (dns.hasDns === false) {
+        return {
+          domain,
+          available: true,
+          status: "LIKELY AVAILABLE",
+          confidence: "Medium (DNS NXDOMAIN, Registry Inconclusive)",
+          buyUrl,
+          details: { rdap, dns }
+        };
+      }
+
+      return {
+        domain,
+        available: null,
+        status: "UNKNOWN",
+        confidence: "Inconclusive (Network Blip)",
+        buyUrl,
+        details: { rdap, dns }
+      };
+    }
+
+    async function batchCheckDomains(candidates, concurrency = 4, onProgress = null) {
+      const results = [];
+      const queue = [...candidates];
+      let done = 0;
+      const total = candidates.length;
+
+      async function worker() {
+        while (queue.length > 0) {
+          const item = queue.shift();
+          try {
+            const check = await checkDomainAvailability(item.domain);
+            const merged = Object.assign({}, item, check);
+            results.push(merged);
+            done++;
+            if (onProgress) onProgress(merged, done, total);
+          } catch (err) {
+            const failed = Object.assign({}, item, {
+              available: false,
+              status: "ERROR",
+              confidence: err.message,
+              buyUrl: "https://www.namecheap.com/domains/registration/results/?domain=" + encodeURIComponent(item.domain)
+            });
+            results.push(failed);
+            done++;
+            if (onProgress) onProgress(failed, done, total);
+          }
+
+          await new Promise(r => setTimeout(r, 140));
+        }
+      }
+
+      const workerCount = Math.min(concurrency, candidates.length);
+      await Promise.all(Array.from({ length: workerCount }, () => worker()));
+      return results;
+    }
+
+
+    /* ═══════════════════════════════════════════════════════════════
+       UI CONTROLLER (Zero-Flicker Live Streaming)
+       ═══════════════════════════════════════════════════════════════ */
+    const DOM = {
+      scanBtn: document.getElementById("scan-btn"),
+      scanBtnText: document.getElementById("scan-btn-text"),
+      scanSpinner: document.getElementById("scan-spinner"),
+      keywordInput: document.getElementById("keyword-input"),
+      themeSelect: document.getElementById("theme-select"),
+      countSelect: document.getElementById("count-select"),
+      probeInput: document.getElementById("probe-input"),
+      probeBtn: document.getElementById("probe-btn"),
+      probeResult: document.getElementById("probe-result"),
+      progressContainer: document.getElementById("progress-container"),
+      progressFill: document.getElementById("progress-fill"),
+      progressLabel: document.getElementById("progress-label"),
+      toolbar: document.getElementById("results-toolbar"),
+      summary: document.getElementById("results-summary"),
+      filterCheck: document.getElementById("filter-available"),
+      grid: document.getElementById("results-grid"),
+      btnCopy: document.getElementById("btn-copy-available")
+    };
+
+    let allResults = [];
+    let isScanning = false;
+    let selectedTLDs = [".com"];
+
+    // TLD chip handlers
+    document.querySelectorAll(".tld-chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        chip.classList.toggle("active");
+        selectedTLDs = Array.from(document.querySelectorAll(".tld-chip.active")).map(c => c.dataset.tld);
+        if (selectedTLDs.length === 0) {
+          chip.classList.add("active");
+          selectedTLDs = [chip.dataset.tld];
+        }
+      });
+    });
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      const div = document.createElement("div");
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    function renderEmptyState(msg) {
+      DOM.grid.innerHTML = '<div class="empty-state"><div class="empty-icon">◎</div>' + escapeHtml(msg) + '</div>';
+    }
+
+    async function runScan() {
+      if (isScanning) return;
+      isScanning = true;
+
+      DOM.scanBtn.disabled = true;
+      DOM.scanBtnText.textContent = "Scanning...";
+      DOM.scanSpinner.style.display = "inline-block";
+      DOM.progressContainer.classList.add("active");
+      DOM.progressFill.style.width = "0%";
+      DOM.probeResult.className = "probe-result";
+      DOM.probeResult.style.display = "none";
+      if (DOM.btnCopy) DOM.btnCopy.style.display = "none";
+
+      allResults = [];
+
+      const candidates = generateBrandNames({
+        keyword: DOM.keywordInput.value,
+        theme: DOM.themeSelect.value,
+        count: parseInt(DOM.countSelect.value, 10),
+        tlds: selectedTLDs
+      });
+
+      DOM.progressLabel.innerHTML = "Generating <strong>" + candidates.length + "</strong> candidates across " + selectedTLDs.join(", ") + "...";
+
+      // Pre-render checking skeleton cards for instant real-time feedback
+      DOM.toolbar.style.display = "flex";
+      DOM.summary.innerHTML = "SCANNED: <strong>0</strong> | AVAILABLE: <strong>0</strong>";
+
+      DOM.grid.innerHTML = candidates.map((item, idx) => {
+        const cardId = "card-" + item.domain.replace(/[^a-z0-9]/g, "-");
+        return '<div class="domain-card is-checking" id="' + cardId + '" style="animation-delay: ' + Math.min(idx * 20, 300) + 'ms">' +
+          '<div class="card-top">' +
+            '<div class="card-name">' + escapeHtml(item.name || item.domain.split('.')[0]) + '</div>' +
+            '<div class="card-style-tag">' + escapeHtml(item.style || 'Radar') + '</div>' +
+          '</div>' +
+          '<div class="card-domain">// ' + escapeHtml(item.domain) + '</div>' +
+          '<div class="card-bottom">' +
+            '<div class="card-status checking"><span class="spinner light" style="margin-right:6px"></span> VERIFYING...</div>' +
+          '</div>' +
+        '</div>';
+      }).join("");
+
+      const total = candidates.length;
+
+      await batchCheckDomains(candidates, 3, (result, doneCount, totalCount) => {
+        allResults.push(result);
+        const pct = Math.round((doneCount / totalCount) * 100);
+        DOM.progressFill.style.width = pct + "%";
+
+        const availCount = allResults.filter(r => r.available).length;
+        DOM.progressLabel.innerHTML = "Checked <strong>" + doneCount + "</strong>/" + totalCount + " — <strong>" + availCount + "</strong> available";
+        DOM.summary.innerHTML = "SCANNED: <strong>" + doneCount + "</strong> | AVAILABLE: <strong>" + availCount + "</strong>";
+
+        // In-place card DOM update without screen flickering
+        const cardId = "card-" + result.domain.replace(/[^a-z0-9]/g, "-");
+        const cardEl = document.getElementById(cardId);
+        if (cardEl) {
+          const isAvail = result.available === true;
+          const isTaken = result.available === false;
+          cardEl.className = "domain-card " + (isAvail ? "is-available" : isTaken ? "is-taken" : "");
+
+          if (DOM.filterCheck.checked && isTaken) {
+            cardEl.style.display = "none";
+          } else {
+            cardEl.style.display = "";
+          }
+
+          const statusClass = isAvail ? "available" : isTaken ? "taken" : "unknown";
+          const statusText = isAvail ? "● AVAILABLE" : isTaken ? "✕ REGISTERED" : "? UNKNOWN";
+
+          const bottomEl = cardEl.querySelector(".card-bottom");
+          if (bottomEl) {
+            bottomEl.innerHTML = '<div class="card-status ' + statusClass + '">' + statusText + '</div>' +
+              (isAvail ? '<a href="' + escapeHtml(result.buyUrl) + '" target="_blank" rel="noopener" class="btn-claim">Claim →</a>' : '');
+          }
+        }
+      });
+
+      // Scan complete
+      DOM.progressContainer.classList.remove("active");
+      const totalAvailable = allResults.filter(r => r.available).length;
+      DOM.summary.innerHTML = "SCANNED: <strong>" + allResults.length + "</strong> | AVAILABLE: <strong>" + totalAvailable + "</strong> domains";
+
+      if (DOM.btnCopy && totalAvailable > 0) {
+        DOM.btnCopy.style.display = "inline-flex";
+      }
+
+      isScanning = false;
+      DOM.scanBtn.disabled = false;
+      DOM.scanBtnText.textContent = "▶ Execute Scan";
+      DOM.scanSpinner.style.display = "none";
+    }
+
+    function applyFilter() {
+      const showOnlyAvailable = DOM.filterCheck.checked;
+      allResults.forEach(r => {
+        const cardId = "card-" + r.domain.replace(/[^a-z0-9]/g, "-");
+        const cardEl = document.getElementById(cardId);
+        if (cardEl) {
+          if (showOnlyAvailable && !r.available) {
+            cardEl.style.display = "none";
+          } else {
+            cardEl.style.display = "";
+          }
+        }
+      });
+    }
+
+    async function probeSingle() {
+      const raw = DOM.probeInput.value.trim().toLowerCase();
+      if (!raw) return;
+
+      const domain = sanitizeDomain(raw);
+
+      DOM.probeBtn.disabled = true;
+      DOM.probeBtn.textContent = "Checking...";
+      DOM.probeResult.className = "probe-result";
+      DOM.probeResult.style.display = "none";
+
+      try {
+        const result = await checkDomainAvailability(domain);
+
+        if (result.available === true) {
+          DOM.probeResult.className = "probe-result available";
+          DOM.probeResult.innerHTML = "● <strong>" + escapeHtml(result.domain) + "</strong> is AVAILABLE! " +
+            '<a href="' + escapeHtml(result.buyUrl) + '" target="_blank" rel="noopener">Register Now →</a>';
+        } else if (result.available === false) {
+          DOM.probeResult.className = "probe-result taken";
+          DOM.probeResult.innerHTML = "✕ <strong>" + escapeHtml(result.domain) + "</strong> is TAKEN (" + escapeHtml(result.confidence) + ")";
+        } else {
+          DOM.probeResult.className = "probe-result unknown";
+          DOM.probeResult.innerHTML = "? <strong>" + escapeHtml(result.domain) + "</strong> — Could not determine (" + escapeHtml(result.confidence) + ")";
+        }
+        DOM.probeResult.style.display = "block";
+
+        // Prepend to grid
+        const cardId = "card-" + result.domain.replace(/[^a-z0-9]/g, "-");
+        const existing = document.getElementById(cardId);
+        if (!existing) {
+          const isAvail = result.available === true;
+          const isTaken = result.available === false;
+          const statusClass = isAvail ? "available" : isTaken ? "taken" : "unknown";
+          const statusText = isAvail ? "● AVAILABLE" : isTaken ? "✕ REGISTERED" : "? UNKNOWN";
+
+          const cardHtml = '<div class="domain-card ' + (isAvail ? 'is-available' : isTaken ? 'is-taken' : '') + '" id="' + cardId + '">' +
+            '<div class="card-top">' +
+              '<div class="card-name">' + escapeHtml(result.domain.split('.')[0]) + '</div>' +
+              '<div class="card-style-tag">Direct Probe</div>' +
+            '</div>' +
+            '<div class="card-domain">// ' + escapeHtml(result.domain) + '</div>' +
+            '<div class="card-bottom">' +
+              '<div class="card-status ' + statusClass + '">' + statusText + '</div>' +
+              (isAvail ? '<a href="' + escapeHtml(result.buyUrl) + '" target="_blank" rel="noopener" class="btn-claim">Claim →</a>' : '') +
+            '</div>' +
+          '</div>';
+
+          DOM.grid.insertAdjacentHTML('afterbegin', cardHtml);
+          allResults.unshift(result);
+          DOM.toolbar.style.display = "flex";
+        }
+      } catch (err) {
+        DOM.probeResult.className = "probe-result unknown";
+        DOM.probeResult.innerHTML = "Error checking domain: " + escapeHtml(err.message);
+        DOM.probeResult.style.display = "block";
+      } finally {
+        DOM.probeBtn.disabled = false;
+        DOM.probeBtn.textContent = "Probe";
+      }
+    }
+
+    // Event Listeners
+    DOM.scanBtn.addEventListener("click", runScan);
+    DOM.filterCheck.addEventListener("change", applyFilter);
+    DOM.probeBtn.addEventListener("click", probeSingle);
+    DOM.probeInput.addEventListener("keydown", (e) => { if (e.key === "Enter") probeSingle(); });
+    DOM.keywordInput.addEventListener("keydown", (e) => { if (e.key === "Enter") runScan(); });
+
+    // Copy Available Button
+    if (DOM.btnCopy) {
+      DOM.btnCopy.addEventListener("click", () => {
+        const available = allResults.filter(r => r.available).map(r => r.domain).join("\n");
+        if (available) {
+          navigator.clipboard.writeText(available).then(() => {
+            DOM.btnCopy.classList.add("copied");
+            DOM.btnCopy.textContent = "✓ Copied " + allResults.filter(r => r.available).length + " Domains!";
+            setTimeout(() => {
+              DOM.btnCopy.classList.remove("copied");
+              DOM.btnCopy.textContent = "⧉ Copy Available";
+            }, 2500);
+          });
+        }
+      });
+    }
+
+    // Initial state
+    renderEmptyState('Hit "Execute Scan" or probe a domain to begin radar sweep.');
+  </script>
+</body>
+</html>
+  

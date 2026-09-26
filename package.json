@@ -1,0 +1,33 @@
+{
+  "name": "domain-finder",
+  "version": "1.0.0",
+  "description": "This tool finds domains that are free to be taken. Automated brand & .COM domain discovery engine natively running on GitHub Pages & Node.js.",
+  "main": "server.js",
+  "homepage": "https://zcross091.github.io/Domain-Finder/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zcross091/Domain-Finder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Zcross091/Domain-Finder/issues"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "cli": "node bot.js",
+    "radar": "node bot.js",
+    "test": "node bot.js --count=5"
+  },
+  "keywords": [
+    "domain-finder",
+    "free-domains",
+    "domain-checker",
+    "brand-generator",
+    "rdap",
+    "verisign",
+    "github-pages",
+    "dns-over-https"
+  ],
+  "author": "Zcross091",
+  "license": "MIT"
+}
