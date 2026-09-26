@@ -1050,7 +1050,31 @@
         clearTimeout(timeoutId);
 
         if (res.status === 404) return { available: true, method: registry + " (404 Not Found)", registry };
-        if (res.status === 200) return { available: false, method: registry + " (Registered)", registry };
+        if (res.status === 200) {
+          let extra = "";
+          let regYear = null;
+          let registrar = null;
+          try {
+            const data = await res.json();
+            if (data.events) {
+              const ev = data.events.find(e => e.eventAction === "registration");
+              if (ev && ev.eventDate) regYear = new Date(ev.eventDate).getFullYear();
+            }
+            if (data.entities) {
+              const regEnt = data.entities.find(e => e.roles && e.roles.includes("registrar"));
+              if (regEnt && regEnt.vcardArray && regEnt.vcardArray[1]) {
+                const fn = regEnt.vcardArray[1].find(item => item[0] === "fn");
+                if (fn && fn[3]) registrar = fn[3];
+              }
+            }
+          } catch (_) {}
+
+          if (regYear && registrar) extra = " — Registered in " + regYear + " via " + registrar;
+          else if (regYear) extra = " — Registered in " + regYear;
+          else if (registrar) extra = " — Registered via " + registrar;
+
+          return { available: false, method: registry + " (Registered)" + extra, registry, regYear, registrar, extra };
+        }
         return { available: null, method: registry + " (Status " + res.status + ")", registry };
       } catch (err) {
         clearTimeout(timeoutId);
@@ -1117,11 +1141,12 @@
       const rdap = await checkRDAP(domain);
 
       if (rdap.available === false) {
+        const extraConfidence = rdap.extra ? rdap.extra.replace(/^ — /, "") : (rdap.registry || "Official Registry");
         return {
           domain,
           available: false,
           status: "TAKEN",
-          confidence: "High (" + (rdap.registry || "Official Registry") + ")",
+          confidence: "High (" + extraConfidence + ")",
           buyUrl,
           details: { rdap }
         };
@@ -1388,7 +1413,9 @@
             '<a href="' + escapeHtml(result.buyUrl) + '" target="_blank" rel="noopener">Register Now →</a>';
         } else if (result.available === false) {
           DOM.probeResult.className = "probe-result taken";
-          DOM.probeResult.innerHTML = "✕ <strong>" + escapeHtml(result.domain) + "</strong> is TAKEN (" + escapeHtml(result.confidence) + ")";
+          DOM.probeResult.innerHTML = "✕ <strong>" + escapeHtml(result.domain) + "</strong> is TAKEN (" + escapeHtml(result.confidence) + ")" +
+            "<span style='display:block;margin-top:6px;font-size:11px;color:var(--text-tertiary);line-height:1.4;'>💡 Note: A domain can be owned even if no website is currently hosted on it (e.g. parked/inactive server). " +
+            "<a href='" + escapeHtml(result.buyUrl) + "' target='_blank' rel='noopener' style='color:var(--accent-cyan);text-decoration:underline;'>Verify on Registrar →</a></span>";
         } else {
           DOM.probeResult.className = "probe-result unknown";
           DOM.probeResult.innerHTML = "? <strong>" + escapeHtml(result.domain) + "</strong> — Could not determine (" + escapeHtml(result.confidence) + ")";
