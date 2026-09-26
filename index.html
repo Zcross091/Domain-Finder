@@ -8,7 +8,9 @@
   <meta name="keywords" content="domain finder, free domains, domain availability, domain checker, brand name generator, .com domains">
   <meta property="og:title" content="Domain Finder — Free .COM Domain Discovery Engine">
   <meta property="og:description" content="Find available .com domains instantly. Real-time availability checks against official Verisign RDAP registry.">
-  <meta property="og:type" content="website">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="favicon.svg">
+  <meta name="theme-color" content="#06080d">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -127,31 +129,41 @@
       gap: 14px;
     }
 
-    .logo-icon {
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: radial-gradient(circle at 40% 40%, var(--accent-cyan) 0%, rgba(0,229,255,0.15) 50%, transparent 70%);
-      border: 1.5px solid rgba(0,229,255,0.35);
-      box-shadow: 0 0 20px rgba(0,229,255,0.25), inset 0 0 12px rgba(0,229,255,0.15);
+    .logo-badge {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       position: relative;
-      animation: pulse-icon 3s ease-in-out infinite;
+      flex-shrink: 0;
+      transition: transform var(--transition-default), filter var(--transition-default);
+      filter: drop-shadow(0 0 16px rgba(0, 229, 255, 0.35));
     }
 
-    .logo-icon::after {
-      content: "";
-      position: absolute;
-      top: 50%; left: 50%;
-      width: 8px; height: 8px;
-      background: #fff;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      box-shadow: 0 0 6px #fff;
+    .logo-badge:hover {
+      transform: scale(1.06) rotate(2deg);
+      filter: drop-shadow(0 0 24px rgba(0, 229, 255, 0.6));
     }
 
-    @keyframes pulse-icon {
-      0%, 100% { box-shadow: 0 0 20px rgba(0,229,255,0.25), inset 0 0 12px rgba(0,229,255,0.15); }
-      50% { box-shadow: 0 0 30px rgba(0,229,255,0.4), inset 0 0 18px rgba(0,229,255,0.25); }
+    .logo-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .logo-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .logo-tagline {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-tertiary);
     }
 
     .logo-text {
@@ -763,11 +775,47 @@
     <!-- ════ HEADER ════ -->
     <header class="header">
       <div class="logo-group">
-        <div class="logo-icon" aria-hidden="true"></div>
-        <h1 class="logo-text">
-          DOMAIN<span class="highlight">FINDER</span>
-          <span class="dim"> // .COM</span>
-        </h1>
+        <div class="logo-badge" aria-hidden="true">
+          <svg class="logo-svg" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="hdr-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0e1726"/>
+                <stop offset="100%" stop-color="#070b12"/>
+              </linearGradient>
+              <linearGradient id="hdr-border" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#00e5ff"/>
+                <stop offset="50%" stop-color="#00ff87"/>
+                <stop offset="100%" stop-color="#a855f7"/>
+              </linearGradient>
+              <linearGradient id="hdr-sweep" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#00e5ff" stop-opacity="0.85"/>
+                <stop offset="100%" stop-color="#00ff87" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <rect x="2" y="2" width="60" height="60" rx="16" fill="url(#hdr-bg)"/>
+            <rect x="2" y="2" width="60" height="60" rx="16" stroke="url(#hdr-border)" stroke-width="2" stroke-opacity="0.85"/>
+            <circle cx="32" cy="32" r="22" stroke="#00e5ff" stroke-width="1" stroke-opacity="0.2" stroke-dasharray="3 3"/>
+            <circle cx="32" cy="32" r="14" stroke="#00e5ff" stroke-width="1.2" stroke-opacity="0.35"/>
+            <ellipse cx="32" cy="32" rx="22" ry="8" stroke="#00e5ff" stroke-width="1" stroke-opacity="0.25"/>
+            <ellipse cx="32" cy="32" rx="8" ry="22" stroke="#00e5ff" stroke-width="1" stroke-opacity="0.25"/>
+            <line x1="32" y1="10" x2="32" y2="20" stroke="#00ff87" stroke-width="1.75" stroke-linecap="round"/>
+            <line x1="32" y1="44" x2="32" y2="54" stroke="#00ff87" stroke-width="1.75" stroke-linecap="round"/>
+            <line x1="10" y1="32" x2="20" y2="32" stroke="#00ff87" stroke-width="1.75" stroke-linecap="round"/>
+            <line x1="44" y1="32" x2="54" y2="32" stroke="#00ff87" stroke-width="1.75" stroke-linecap="round"/>
+            <path d="M32 32 L50 20 A22 22 0 0 0 32 10 Z" fill="url(#hdr-sweep)" opacity="0.45"/>
+            <circle cx="47" cy="22" r="2" fill="#00ff87"/>
+            <circle cx="19" cy="40" r="1.5" fill="#00e5ff" opacity="0.8"/>
+            <circle cx="32" cy="32" r="5" fill="#00e5ff"/>
+            <circle cx="32" cy="32" r="2.5" fill="#ffffff"/>
+          </svg>
+        </div>
+        <div class="logo-title-group">
+          <h1 class="logo-text">
+            DOMAIN<span class="highlight">FINDER</span>
+            <span class="dim"> // .COM</span>
+          </h1>
+          <span class="logo-tagline">Authoritative Registry Discovery Radar</span>
+        </div>
       </div>
       <div class="header-actions">
         <div class="status-badge">
